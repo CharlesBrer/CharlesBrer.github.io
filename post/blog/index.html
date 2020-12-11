@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="light">
+  <head prefix="og: http://ogp.me/ns#">
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="Hugo 0.79.0">
+<meta name="theme" content="Color Your World -- gitlab.com/rmaguiar/hugo-theme-color-your-world">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<title>KMP算法的理解</title>
+
+
+
+
+
+
+<meta name="robots" content="index follow">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+
+
+
+  
+    <link rel="canonical" href="https://charlesbrer.github.io/post/blog/">
+  
+
+
+
+
+
+
+
+
+<meta property="og:site_name" content="My New Hugo Site">
+<meta property="og:title" content="KMP算法的理解">
+
+  <meta property="og:url" content="https://charlesbrer.github.io/post/blog/">
+
+
+
+
+
+
+
+
+  <meta property="og:type" content="article">
+  
+  
+    <meta property="article:published_time" content="2020-12-11">
+    <meta property="article:modified_time" content="2020-12-11">
+    <meta property="og:updated_time" content="2020-12-11">
+  
+
+  
+  
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="theme-color" content="#222">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "mainEntityOfPage": {
+        "@type": "WebSite",
+        "@id": "https:\/\/charlesbrer.github.io\/"
+      },
+      "headline": "KMP算法的理解",
+      "description": "",
+      
+      "url": "https:\/\/charlesbrer.github.io\/post\/blog\/",
+      "inLanguage": "en",
+      "datePublished": "2020-12-11",
+      "dateModified": "2020-12-11",
+      "wordCount" : "600",
+      "publisher": {
+        "@type": "Person",
+        "name": ""
+      },
+      "author": {
+        "@type": "Person",
+        "name": "",
+        
+        
+      }
+    }
+  </script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.min.9d52f3786dbb8f4abed649c1e7b6e2a4c0f89d1f25225bef7fd755836d8feb1568d05a04bbaf2976df1cda05c03ba834e7fdd5544cd184ce76fa15c8e357a7f5.css" integrity="sha512-nVLzeG27j0q&#43;1knB57bipMD4nR8lIlvvf9dVg22P6xVo0FoEu68pdt8c2gXAO6g05/3VVEzRhM52&#43;hXI41en9Q==">
+
+
+
+<noscript>
+
+  
+  
+
+  
+    <meta name="theme-color" content="#dd587c" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#225670" media="(prefers-color-scheme: light)">
+  
+
+  <style>
+  
+    html {
+      --accent: #225670;
+    }
+  
+    .req-js,
+    img.lazyload {
+      display: none;
+    }
+    
+  </style>
+  
+</noscript>
+
+
+
+
+
+
+  <link rel="preload" href="/fonts/open-sans-v17-latin-700.woff" as="font" crossorigin="anonymous">
+
+  <link rel="preload" href="/fonts/open-sans-v17-latin-700.woff2" as="font" crossorigin="anonymous">
+
+  <link rel="preload" href="/fonts/open-sans-v17-latin-italic.woff" as="font" crossorigin="anonymous">
+
+  <link rel="preload" href="/fonts/open-sans-v17-latin-italic.woff2" as="font" crossorigin="anonymous">
+
+  <link rel="preload" href="/fonts/open-sans-v17-latin-regular.woff" as="font" crossorigin="anonymous">
+
+  <link rel="preload" href="/fonts/open-sans-v17-latin-regular.woff2" as="font" crossorigin="anonymous">
+
+  <link rel="preload" href="/fonts/oswald-v29-latin-700.woff" as="font" crossorigin="anonymous">
+
+  <link rel="preload" href="/fonts/oswald-v29-latin-700.woff2" as="font" crossorigin="anonymous">
+
+
+
+
+
+<script defer src="/js/lazysizes.min.min.a85a0eccaf9ef0d2f083a9dc4d0e05dc90acc5be0e84b43e20fde692871e1861ae0191f7c3ca2c00f2664efabf6aff2625a478b8f22ea43cb056cb6ec9a8d948.js" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+    
+      'use strict';const PREFERS_LIGHT=window.matchMedia('(prefers-color-scheme: light)');const PREFERS_DARK=window.matchMedia('(prefers-color-scheme: dark)');const ROOT=document.documentElement;const SHEET=document.documentElement.style;const META_THEME_COLOR=document.querySelector('meta[name=theme-color]');function setDark(){ROOT.dataset.mode='dark'};function setLight(){ROOT.dataset.mode='light'};if(localStorage.getItem('isDark')=='true'){setDark()}else if(localStorage.getItem('isDark')=='false'){setLight()}else if(PREFERS_DARK.matches){setDark()}else if(PREFERS_LIGHT.matches){setLight()};function getAccent(){if(ROOT.dataset.mode==='dark'){if(localStorage.getItem('darkAccent')===null){var currentAccent="#dd587c"}else{var currentAccent=localStorage.getItem('darkAccent')
+}}else if(ROOT.dataset.mode==='light'){if(localStorage.getItem('lightAccent')===null){var currentAccent="#225670"}else{var currentAccent=localStorage.getItem('lightAccent')
+}};return currentAccent};var activeAccent=getAccent();SHEET.setProperty('--accent',activeAccent);META_THEME_COLOR.setAttribute('content',activeAccent);function updateAccent(){var activeAccent=getAccent();SHEET.setProperty('--accent',activeAccent);PALETTE.value=activeAccent;META_THEME_COLOR.setAttribute('content',activeAccent);};document.addEventListener('DOMContentLoaded',function(){PALETTE.value=activeAccent;function smoothTransition(){document.body.style.transition=document.querySelector('header').style.transition=document.querySelector('footer').style.transition='background-color .3s ease, color .3s ease'};function userModeChange(){smoothTransition();if(ROOT.dataset.mode=='light'){setDark();localStorage.setItem('isDark','true')
+}else{setLight();localStorage.setItem('isDark','false')
+};updateAccent()};function OSModeChange(){smoothTransition();if(PREFERS_LIGHT.matches){setLight();localStorage.setItem('isDark','false')
+}else if(PREFERS_DARK.matches){setDark();localStorage.setItem('isDark','true')
+};updateAccent()};PREFERS_LIGHT.addListener(OSModeChange);PREFERS_DARK.addListener(OSModeChange);document.querySelector('footer button').addEventListener('click',userModeChange)})
+    
+  </script>
+
+
+
+  </head>
+
+  <body>
+
+    <header>
+      
+
+  <a href="/">My New Hugo Site</a>
+
+
+
+
+
+    </header>
+
+    <div class="filler">
+      
+
+  <main>
+    <article>
+      <header>
+        
+        <h1>KMP算法的理解</h1>
+
+        
+          <p>
+            
+              Published on <time datetime="2020-12-11">2020-12-11</time>
+            
+          </p>
+        
+        
+        
+        
+      </header>
+    
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <h1 id="前言">前言</h1> 
+
+<p>在学习KMP算法的过程中，当了解了什么是最长公共前后缀，了解了什么是next数组之后，我们自然想要将KMP算法具体实现出来，那么如何将KMP算法的代码写出来呢，或者说如何去理解KMP算法的代码呢？</p>
+
+
+
+
+
+  <h2 id="一next数组"><a class="anchor" href="#一next数组" title='Anchor for "一、next数组".'><svg aria-hidden="true"><use xlink:href="#hashtag"/></svg></a> 一、next数组</h2> 
+
+<p>首先我们要知道什么是模式串的next数组：</p>
+<p>通俗来讲，next数组是一个长度为模式串长度的整型数组在next[i]存放的数值大小即为对应的模式串s从s[0]至s[i-1]这一子串的最长公共前后缀，举个例子：模式串s为：a c t a c b
+（前缀用<strong>粗体</strong>表示，后缀用<em>斜体</em>表示）</p>
+<section class="scroll" tabindex="0"> <table>
+<thead>
+<tr>
+<th>下标</th>
+<th>子串</th>
+<th>最长公共前后缀长度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>a</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>ac</td>
+<td>0</td>
+</tr>
+<tr>
+<td>2</td>
+<td>act</td>
+<td>0</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>a</strong> ct <em>a</em></td>
+<td>1</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>ac</strong> t <em>ac</em></td>
+<td>2</td>
+</tr>
+<tr>
+<td>5</td>
+<td>actacb</td>
+<td>0</td>
+</tr>
+<tr>
+<td>故，该例子的next数组为：=={0,0,0,1,2,0}==</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table> </section>
+<p>那么，next数组该怎么用呢？</p>
+<p>我们给出文本串 k：a c t a c t a c b</p>
+<p>此时来进行匹配：</p>
+<section class="scroll" tabindex="0"> <table>
+<thead>
+<tr>
+<th>下标</th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>文本串</td>
+<td>a</td>
+<td>c</td>
+<td>t</td>
+<td>a</td>
+<td>c</td>
+<td><!-- raw HTML omitted --><strong>t</strong></td>
+<td>a</td>
+<td>c</td>
+<td>b</td>
+</tr>
+<tr>
+<td>模式串</td>
+<td>a</td>
+<td>c</td>
+<td>t</td>
+<td>a</td>
+<td>c</td>
+<td><!-- raw HTML omitted --><strong>b</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>next</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td><!-- raw HTML omitted --><strong>2</strong></td>
+<td>0</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>模式串下标</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table> </section>
+<p>在匹配到最后一个字符的时候，失配了，这个时候我们要进行模式串的向后滑动，那么滑动到哪里呢？</p>
+<blockquote>
+<p>如果不计较算法的高效，我们只需要向后滑动一位，再重新一位一位比较匹配即可</p>
+</blockquote>
+<p>而我们在得到了模式串next数组的值以后，假如在模式串的第i位失配，则我们先看next[i-1]，并将其值所对应的下标“滑动”到失配的位置，话不多说，上图</p>
+<section class="scroll" tabindex="0"> <table>
+<thead>
+<tr>
+<th>下标</th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>文本串</td>
+<td>a</td>
+<td>c</td>
+<td>t</td>
+<td>a</td>
+<td>c</td>
+<td><!-- raw HTML omitted --><strong>t</strong></td>
+<td>a</td>
+<td>c</td>
+<td>b</td>
+</tr>
+<tr>
+<td>模式串</td>
+<td></td>
+<td></td>
+<td></td>
+<td>a</td>
+<td>c</td>
+<td><!-- raw HTML omitted --><strong>t</strong></td>
+<td>a</td>
+<td>c</td>
+<td>b</td>
+</tr>
+<tr>
+<td>next</td>
+<td></td>
+<td></td>
+<td></td>
+<td>0</td>
+<td><!-- raw HTML omitted --><strong>0</strong></td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>0</td>
+</tr>
+<tr>
+<td>模式串下标</td>
+<td></td>
+<td></td>
+<td></td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+</tr>
+<tr>
+<td>如图，在i=5时失配，next[4]所对应的值为2，则将模式串下标为2的位置“滑动”到当前的失配位，也就是i=5的位置，如图，模式串其他的元素也会随着一起“滑动”，随后直接从该位置继续匹配。</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table> </section>
+<p>这个时候，匹配成功，继续匹配，直到模式串的最后一个元素也匹配成功，得出结果，如图</p>
+<section class="scroll" tabindex="0"> <table>
+<thead>
+<tr>
+<th>下标</th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>文本串</td>
+<td>a</td>
+<td>c</td>
+<td>t</td>
+<td>a</td>
+<td>c</td>
+<td>t</td>
+<td>a</td>
+<td>c</td>
+<td><!-- raw HTML omitted --><strong>b</strong></td>
+</tr>
+<tr>
+<td>模式串</td>
+<td></td>
+<td></td>
+<td></td>
+<td>a</td>
+<td>c</td>
+<td>t</td>
+<td>a</td>
+<td>c</td>
+<td><!-- raw HTML omitted --><strong>b</strong></td>
+</tr>
+<tr>
+<td>next</td>
+<td></td>
+<td></td>
+<td></td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td><!-- raw HTML omitted --><strong>2</strong></td>
+<td>0</td>
+</tr>
+<tr>
+<td>模式串下标</td>
+<td></td>
+<td></td>
+<td></td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+</tr>
+<tr>
+<td>此时，匹配结束，这就是通过next数组进行匹配的流程</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table> </section>
+
+
+
+
+
+  <h2 id="原因"><a class="anchor" href="#原因" title='Anchor for "原因".'><svg aria-hidden="true"><use xlink:href="#hashtag"/></svg></a> 原因</h2> 
+
+<p>next数组为什么会这么神奇呢？为什么按照这样来“滑动”，可以把之前的一部分模式串直接跳过呢？相比这是大多数人刚学KMP算法的时候所思考的。我们再回到刚刚失配时的操作：</p>
+<section class="scroll" tabindex="0"> <table>
+<thead>
+<tr>
+<th>下标i</th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>文本串</td>
+<td>a</td>
+<td>c</td>
+<td>t</td>
+<td><!-- raw HTML omitted --><strong>a</strong></td>
+<td><!-- raw HTML omitted --><strong>c</strong></td>
+<td><!-- raw HTML omitted --><strong>t</strong></td>
+<td>a</td>
+<td>c</td>
+<td>b</td>
+</tr>
+<tr>
+<td>模式串</td>
+<td><!-- raw HTML omitted --><strong>a</strong></td>
+<td><!-- raw HTML omitted --><strong>c</strong></td>
+<td>t</td>
+<td><!-- raw HTML omitted --><strong>a</strong></td>
+<td><!-- raw HTML omitted --><strong>c</strong></td>
+<td><!-- raw HTML omitted --><strong>b</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>next</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td><!-- raw HTML omitted --><strong>2</strong></td>
+<td>0</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>模式串下标j</td>
+<td>0</td>
+<td>1</td>
+<td><strong>2</strong></td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>如图，不难看出，在失配的时候，k[i]与s[j]自然是不相等的，这个时候我们就需要将模式串索引为next[j-1]的元素移动到i这个位置。</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table> </section>
+<p>我们可以得到以下等式：
+$$k[i-m] =s[j-m]=,m=1,2,…next[j-1]$$
+$$s[m] = s[len-2\times next[j-1]+m],m = 1,2,…next[j-1],len = s.size()$$</p>
+<p>看起来有点头晕，我们就拿上面那个来举例子</p>
+<pre aria-label="Box containing code sample." tabindex=0><code>next[j-1]是2
+则第一个等式的意思是,在失配位之前有2个字符，模式串与文本串是匹配的（即图中绿色的两组子串)
+</code></pre>
+<section class="scroll" tabindex="0"> <table>
+<thead>
+<tr>
+<th>下标i</th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>文本串</td>
+<td>a</td>
+<td>c</td>
+<td>t</td>
+<td><!-- raw HTML omitted --><strong>a</strong></td>
+<td><!-- raw HTML omitted --><strong>c</strong></td>
+<td><!-- raw HTML omitted --><strong>t</strong></td>
+<td>a</td>
+<td>c</td>
+<td>b</td>
+</tr>
+<tr>
+<td>模式串</td>
+<td><strong>a</strong></td>
+<td><strong>c</strong></td>
+<td>t</td>
+<td><!-- raw HTML omitted --><strong>a</strong></td>
+<td><!-- raw HTML omitted --><strong>c</strong></td>
+<td><!-- raw HTML omitted --><strong>b</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>next</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td><!-- raw HTML omitted --><strong>2</strong></td>
+<td>0</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>模式串下标j</td>
+<td>0</td>
+<td>1</td>
+<td><strong>2</strong></td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>而第二个等式的意思是,在失配位之前，存在长度为2的相同的前后缀，也就是最大公共前后缀(即图中绿色的两组子串)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table> </section>
+<section class="scroll" tabindex="0"> <table>
+<thead>
+<tr>
+<th>下标i</th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>文本串</td>
+<td>a</td>
+<td>c</td>
+<td>t</td>
+<td><strong>a</strong></td>
+<td><strong>c</strong></td>
+<td><!-- raw HTML omitted --><strong>t</strong></td>
+<td>a</td>
+<td>c</td>
+<td>b</td>
+</tr>
+<tr>
+<td>模式串</td>
+<td><!-- raw HTML omitted --><strong>a</strong></td>
+<td><!-- raw HTML omitted --><strong>c</strong></td>
+<td>t</td>
+<td><!-- raw HTML omitted --><strong>a</strong></td>
+<td><!-- raw HTML omitted --><strong>c</strong></td>
+<td><!-- raw HTML omitted --><strong>b</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>next</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td><!-- raw HTML omitted --><strong>2</strong></td>
+<td>0</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>模式串下标j</td>
+<td>0</td>
+<td>1</td>
+<td><strong>2</strong></td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table> </section>
+<p>由这两个等式就可以得出一个结论：==在出现失配之前，会有长度为next[j-1]的最大公共前后缀已经在这次比较时匹配过，在模式串“滑动”的时候，我们就可以跳过这些已经匹配过的前缀，而前缀的长度正好是next[j-1]，所以我们只需要将s[next[j-1]这个位置移动到失配位，这个时候，模式串的前缀正好和刚刚匹配过的文本串的后缀重合，不需要再次匹配。==</p>
+
+
+
+
+
+  <h2 id="求next数组"><a class="anchor" href="#求next数组" title='Anchor for "求next数组".'><svg aria-hidden="true"><use xlink:href="#hashtag"/></svg></a> 求next数组</h2> 
+
+<p>在明白了原理以后，我们就需要根据模板串来获得其next数组，现在让我们一起试试吧。</p>
+<p>由于这个很难从零讲清楚，我先放上代码，随后通过解析代码来分析</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#75715e">//获取模式串的next数组
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">getNext</span>(<span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>next, string needle){
+            <span style="color:#66d9ef">int</span> j <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+            next[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+            <span style="color:#66d9ef">for</span>(<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;i<span style="color:#f92672">&lt;</span>needle.size();i<span style="color:#f92672">++</span>){
+                <span style="color:#66d9ef">while</span>(j<span style="color:#f92672">&gt;</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> needle[i]<span style="color:#f92672">!=</span>needle[j]){
+                    j <span style="color:#f92672">=</span> next[j<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>];
+                }
+                <span style="color:#66d9ef">if</span>(needle[i]<span style="color:#f92672">==</span>needle[j]) j<span style="color:#f92672">++</span>;
+                next[i] <span style="color:#f92672">=</span> j;
+            }
+        }
+</code></pre></div><p>首先，我们传入一个空的next数组，并将模式串needle传入。</p>
+<p><code>int j = 0; next[0] = 0;</code></p>
+<pre aria-label="Box containing code sample." tabindex=0><code>这里j有两个含义，一个是当前比较的游标，一个是最大公共前后缀的长度。
+由于模式串的第一个子串是不会存在前后缀的，最大公共前后缀长度为0，故设next[0]为0
+</code></pre>
+<p><code>for循环</code></p>
+<pre aria-label="Box containing code sample." tabindex=0><code>从模式串的第二位遍历到模式串最后一位
+</code></pre>
+<p>next[i]的确定分两步，我们可以想象一下，此时j为最大公共前缀的长度，而needle[j-1]代表了最大公共前缀的最后一位。</p>
+<pre aria-label="Box containing code sample." tabindex=0><code>如果needle[i]==needle[j]：则needle[j]也是是当前子串的最大公共前缀的一部分，则j应该自增1，在自增的同时，将j下一次比较的游标向后挪一位。
+
+在j自增以后，由于needle[i]所在的位置已经是当前子串的最后一位，则不会再有更长的公共前后缀，所以，将j的值赋给next[i]即可。则可以把代码补全如下：
+</code></pre>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#75715e">//获取模式串的next数组
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">getNext</span>(<span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>next, string needle){
+            <span style="color:#66d9ef">int</span> j <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+            next[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+            <span style="color:#75715e">//处理前后缀相等的情况
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">if</span>(needle[i]<span style="color:#f92672">==</span>needle[j]) j<span style="color:#f92672">++</span>;
+                next[i] <span style="color:#f92672">=</span> j;
+            }
+        }
+</code></pre></div><pre aria-label="Box containing code sample." tabindex=0><code>如果needle[i]!=needle[j]：在前后缀不相等时，说明最大公共前后缀长度不可以再增加，我们需要往回退，而往回退的时候，我们希望在之前得到的最大公共前后缀中，获得其最大公共前后缀，并将游标j定位到上一次出现该前缀的位置。
+</code></pre>
+<p>举个例子：在求模式串:==a c a a c c== 的next数组的过程中
+已经得到了这些元素：</p>
+<section class="scroll" tabindex="0"> <table>
+<thead>
+<tr>
+<th>模式串</th>
+<th>a</th>
+<th><!-- raw HTML omitted -->c</th>
+<th>a</th>
+<th><!-- raw HTML omitted -->a</th>
+<th>c</th>
+<th>c</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>next</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>i,j的位置</td>
+<td></td>
+<td>j</td>
+<td></td>
+<td>i</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>index</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+</tr>
+<tr>
+<td>此时，needle[I]!=neelde[j]，j=1，我们看到 a 这个字符不能加入到最大公共前后缀，也就是说 ac不会是这个子串的最大公共前后缀，原最大公共前后缀为a，那么，在原最大公共前后缀这个子串中，也存在着最大公共前后缀，这个例子中最大公共前后缀的最大公共前后缀长度为next[0]=0，不会出现a是这个当前最大公共前后缀的前缀的下一位的可能性，所以回到模式串开头，这个时候needle[i] == needle[j],回到上文中的情况。</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table> </section>
+<section class="scroll" tabindex="0"> <table>
+<thead>
+<tr>
+<th>模式串</th>
+<th><!-- raw HTML omitted -->a</th>
+<th>c</th>
+<th>a</th>
+<th><!-- raw HTML omitted -->a</th>
+<th>c</th>
+<th>c</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>next</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>i,j的位置</td>
+<td>j</td>
+<td></td>
+<td></td>
+<td>i</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>index</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+</tr>
+</tbody>
+</table> </section>
+<pre aria-label="Box containing code sample." tabindex=0><code>理论上，如果能不断找到最大公共前后缀的最大公共前后缀，在发生不匹配后应该继续往前寻找，直到匹配成功或者回到模式串开头，所以应该有两个条件进行回溯，并且在回溯结束后还要判断needle[i]和needle[j]是否相等，如果到最后都不相等，说明最大公共前后缀为0，此时正好是j的值，所以补全代码得
+</code></pre>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#75715e">//获取模式串的next数组
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">getNext</span>(<span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>next, string needle){
+            <span style="color:#66d9ef">int</span> j <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+            next[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+            <span style="color:#66d9ef">for</span>(<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;i<span style="color:#f92672">&lt;</span>needle.size();i<span style="color:#f92672">++</span>){
+                <span style="color:#66d9ef">while</span>(j<span style="color:#f92672">&gt;</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> needle[i]<span style="color:#f92672">!=</span>needle[j]){
+                    j <span style="color:#f92672">=</span> next[j<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>];
+                }
+                <span style="color:#66d9ef">if</span>(needle[i]<span style="color:#f92672">==</span>needle[j]) j<span style="color:#f92672">++</span>;
+                next[i] <span style="color:#f92672">=</span> j;
+            }
+        }
+</code></pre></div>
+
+
+
+
+  <h2 id="实现kmp算法"><a class="anchor" href="#实现kmp算法" title='Anchor for "实现KMP算法".'><svg aria-hidden="true"><use xlink:href="#hashtag"/></svg></a> 实现KMP算法</h2> 
+
+<p>在上文中，我们已经获得了next数组，现在我们需要通过next数组来匹配文本串和模式串了，想到这里就会很头疼，为什么，好像又要写一段逻辑来实现这个功能了，其实不然，请看：</p>
+<p>在求next数组中，我们做了以下工作：</p>
+<ol>
+<li>求出模式串的所有前缀子串的最大公共前后缀的长度</li>
+<li>将求出的长度放到前一个下标所在的位置</li>
+</ol>
+<p>那么在实现字符串匹配的时候，我们能不能用相同的思路呢？答案是肯定的。</p>
+<p>我们把问题再回到：“字符串匹配”上来，字符串匹配需要文本串和模式串遍历到最后，直到模式串的最后一位与文本串完全匹配，就得到了最后的结果。有没有觉得和求next数组的过程很像。</p>
+<p>如果我们把模式串和文本串拼接起来，组成一个新串</p>
+<pre aria-label="Box containing code sample." tabindex=0><code>例如：文本串为：actactacfaa 模式串为：actacf
+则求出next数组后，实现匹配的思路本质上可以看作：
+
+求出串：(actacb)(actactacbaa)
+的next数组中第一个为模式串actacf长度6的元素的下标并作出处理，（括号仅仅用于分开模式串和文本串，没有其他含义）
+</code></pre>
+<p>此时，下标为0，直接从文本串部分开始，我们求出其next数组如下：</p>
+<section class="scroll" tabindex="0"> <table>
+<thead>
+<tr>
+<th>下标</th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th><!-- raw HTML omitted -->3</th>
+<th><!-- raw HTML omitted -->4</th>
+<th><!-- raw HTML omitted -->5</th>
+<th><!-- raw HTML omitted -->6</th>
+<th><!-- raw HTML omitted -->7</th>
+<th><!-- raw HTML omitted --><strong>8</strong></th>
+<th>9</th>
+<th>10</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>文本串</td>
+<td><!-- raw HTML omitted -->a</td>
+<td><!-- raw HTML omitted -->c</td>
+<td><!-- raw HTML omitted -->t</td>
+<td><!-- raw HTML omitted -->a</td>
+<td><!-- raw HTML omitted -->c</td>
+<td><!-- raw HTML omitted -->b</td>
+<td>a</td>
+<td>c</td>
+<td>t</td>
+<td><!-- raw HTML omitted -->a</td>
+<td><!-- raw HTML omitted -->c</td>
+<td><!-- raw HTML omitted -->t</td>
+<td><!-- raw HTML omitted -->a</td>
+<td><!-- raw HTML omitted -->c</td>
+<td><!-- raw HTML omitted --><strong>b</strong></td>
+<td>a</td>
+<td>a</td>
+</tr>
+<tr>
+<td>next</td>
+<td><!-- raw HTML omitted -->0</td>
+<td><!-- raw HTML omitted -->0</td>
+<td><!-- raw HTML omitted -->0</td>
+<td><!-- raw HTML omitted -->1</td>
+<td><!-- raw HTML omitted -->2</td>
+<td><!-- raw HTML omitted -->0</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td><!-- raw HTML omitted --><strong>6</strong></td>
+<td>!</td>
+<td>!</td>
+</tr>
+</tbody>
+</table> </section>
+<p>可以看出，在i=8的时候，出现了next[8] = 6,也就是说，i = 8时正好是这个子串的末尾，所以可以得到模式串在文本串中出现的下标为i-needle.size()+1=3，也正是最终答案。</p>
+<p>所以代码与上部分大同小异，就不详细解释</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">kmp</span>(string haystack,string needle){
+            <span style="color:#75715e">//空串直接返回0
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">if</span>(needle.size()<span style="color:#f92672">==</span><span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+            <span style="color:#75715e">//文本串长度小于模式串直接返回无法找到
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">if</span>(needle.size()<span style="color:#f92672">&gt;</span>haystack.size()) <span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>;
+            <span style="color:#66d9ef">int</span> j <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+            <span style="color:#66d9ef">int</span> next[needle.size()];
+            getNext(next,needle);
+            <span style="color:#66d9ef">for</span>(<span style="color:#66d9ef">int</span> i<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>;i<span style="color:#f92672">&lt;</span>haystack.size();i<span style="color:#f92672">++</span>){
+                <span style="color:#66d9ef">while</span>(j<span style="color:#f92672">&gt;</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> haystack[i] <span style="color:#f92672">!=</span> needle[j]){
+                    j <span style="color:#f92672">=</span> next[j<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>];
+                }
+                <span style="color:#66d9ef">if</span>(haystack[i] <span style="color:#f92672">==</span> needle[j]) j<span style="color:#f92672">++</span>;
+                <span style="color:#75715e">//如果找到了长度为要求的最大公共前后缀，直接退出
+</span><span style="color:#75715e"></span>                <span style="color:#66d9ef">if</span>(j <span style="color:#f92672">==</span> needle.size()) <span style="color:#66d9ef">return</span> (i<span style="color:#f92672">-</span>j<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>);
+            }
+            <span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>;
+        }
+</code></pre></div>
+
+
+
+
+  <h2 id="最后"><a class="anchor" href="#最后" title='Anchor for "最后".'><svg aria-hidden="true"><use xlink:href="#hashtag"/></svg></a> 最后</h2> 
+
+<p>这个算法理解还是需要一些时间，思路在理解了最大公共前后缀后并不难想出来，但是将其转化为实际的代码却是能让人想破脑袋，佩服能写出这个算法的大佬！</p>
+
+
+
+    </article>
+  </main>
+
+
+    </div>
+    
+    <footer>
+      
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+<section class="req-js">
+  <button class="outline-dashed" title="Change to light/dark mode."><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><use xlink:href="#adjust"/></svg></button><input class="outline-dashed" type="color" list="presets" value="#225670" title="Change accent color." aria-label="Change accent color."><datalist id="presets"><option value="#225670"><option value="#dd587c"></datalist>
+</section>
+
+
+
+
+
+    </footer>
+    
+    <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" aria-hidden="true">
+      <symbol viewBox="0 0 512 512" id="adjust">
+        <path d="M8 256c0 136.966 111.033 248 248 248s248-111.034 248-248S392.966 8 256 8 8 119.033 8 256zm248 184V72c101.705 0 184 82.311 184 184 0 101.705-82.311 184-184 184z"/>
+      </symbol>
+      
+      
+      
+      
+  
+<symbol viewBox="0 0 448 512" id="hashtag">
+  <path d="M440.667 182.109l7.143-40c1.313-7.355-4.342-14.109-11.813-14.109h-74.81l14.623-81.891C377.123 38.754 371.468 32 363.997 32h-40.632a12 12 0 0 0-11.813 9.891L296.175 128H197.54l14.623-81.891C213.477 38.754 207.822 32 200.35 32h-40.632a12 12 0 0 0-11.813 9.891L132.528 128H53.432a12 12 0 0 0-11.813 9.891l-7.143 40C33.163 185.246 38.818 192 46.289 192h74.81L98.242 320H19.146a12 12 0 0 0-11.813 9.891l-7.143 40C-1.123 377.246 4.532 384 12.003 384h74.81L72.19 465.891C70.877 473.246 76.532 480 84.003 480h40.632a12 12 0 0 0 11.813-9.891L151.826 384h98.634l-14.623 81.891C234.523 473.246 240.178 480 247.65 480h40.632a12 12 0 0 0 11.813-9.891L315.472 384h79.096a12 12 0 0 0 11.813-9.891l7.143-40c1.313-7.355-4.342-14.109-11.813-14.109h-74.81l22.857-128h79.096a12 12 0 0 0 11.813-9.891zM261.889 320h-98.634l22.857-128h98.634l-22.857 128z"/>
+</symbol>
+
+
+
+      
+      
+      
+    </svg>
+
+    
+    
+    
+
+      <script>
+        
+          'use strict';const PALETTE=document.querySelector('footer input');PALETTE.onchange=function(){const PICK=PALETTE.value;SHEET.setProperty('--accent',PICK);if(ROOT.dataset.mode==='light'){localStorage.setItem('lightAccent',PICK)}else{localStorage.setItem('darkAccent',PICK)};updateAccent()};
+        
+      </script>
+
+    
+    
+    
+    
+
+  </body>
+</html>

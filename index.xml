@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>My New Hugo Site</title>
+    <link>https://charlesbrer.github.io/</link>
+    <description></description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 11 Dec 2020 18:18:43 +0800</lastBuildDate><atom:link href="https://charlesbrer.github.io/index.xml" rel="self" type="application/rss+xml" />
+      <item>
+        <title>KMP算法的理解</title>
+        <link>https://charlesbrer.github.io/post/blog/</link>
+        <pubDate>Fri, 11 Dec 2020 18:18:43 +0800</pubDate>
+        
+        <guid>https://charlesbrer.github.io/post/blog/</guid>
+        <description>前言 在学习KMP算法的过程中，当了解了什么是最长公共前后缀，了解了什么是next数组之后，我们自然想要将KMP算法具体实现出来，那么如何将KMP算法的代码写出来呢，或者说如何去理解KMP算法的代码呢？
+ 一、next数组 首先我们要知道什么是模式串的next数组：
+通俗来讲，next数组是一个长度为模式串长度的整型数组在next[i]存放的数值大小即为对应的模式串s从s[0]至s[i-1]这一子串的最长公共前后缀，举个例子：模式串s为：a c t a c b （前缀用粗体表示，后缀用斜体表示）
+   下标 子串 最长公共前后缀长度     0 a 0   1 ac 0   2 act 0   3 a ct a 1   4 ac t ac 2   5 actacb 0   故，该例子的next数组为：=={0,0,0,1,2,0}==      那么，next数组该怎么用呢？
+我们给出文本串 k：a c t a c t a c b</description>
+      </item>
+    
+  </channel>
+</rss>
